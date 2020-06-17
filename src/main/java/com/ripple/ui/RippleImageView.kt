@@ -11,13 +11,12 @@ import android.text.TextPaint
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
-import android.widget.ImageView
 
 open class RippleImageView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
-) : ImageView(context, attrs, defStyleAttr) {
+) : androidx.appcompat.widget.AppCompatImageView(context, attrs, defStyleAttr) {
 
     companion object {
         private val TAG = RippleImageView::class.java.simpleName
