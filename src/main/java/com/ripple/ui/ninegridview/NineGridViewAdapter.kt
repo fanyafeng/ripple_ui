@@ -2,14 +2,14 @@ package com.ripple.ui.ninegridview
 
 import android.content.Context
 import android.widget.ImageView
-import com.ripple.ui.RippleImageView
+import com.ripple.ui.widget.RippleImageView
 import java.io.Serializable
 
 /**
  * Author: fanyafeng
  * Data: 2020/5/15 10:29
  * Email: fanyafeng@live.cn
- * Description:
+ * Description: 九宫格图片适配器
  */
 abstract class NineGridViewAdapter @JvmOverloads constructor(
     private val mContext: Context,

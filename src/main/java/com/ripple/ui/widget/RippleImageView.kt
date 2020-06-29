@@ -1,4 +1,4 @@
-package com.ripple.ui
+package com.ripple.ui.widget
 
 import android.content.Context
 import android.graphics.Canvas
@@ -11,6 +11,13 @@ import android.text.TextPaint
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+
+/**
+ * Author: fanyafeng
+ * Data: 2020/6/29 13:57
+ * Email: fanyafeng@live.cn
+ * Description: 统一的ImageView
+ */
 
 open class RippleImageView @JvmOverloads constructor(
     context: Context,

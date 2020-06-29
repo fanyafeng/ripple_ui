@@ -1,7 +1,7 @@
 package com.ripple.ui.ninegridview
 
 import android.content.Context
-import com.ripple.ui.RippleImageView
+import com.ripple.ui.widget.RippleImageView
 import java.io.Serializable
 
 /**

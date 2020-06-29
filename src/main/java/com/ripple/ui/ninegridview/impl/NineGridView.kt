@@ -5,11 +5,8 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.LinearLayout
-import com.ripple.ui.RippleImageView
+import com.ripple.ui.widget.RippleImageView
 import com.ripple.ui.ninegridview.*
-import java.io.Serializable
 
 /**
  * Author: fanyafeng
@@ -133,16 +130,6 @@ class NineGridView @JvmOverloads constructor(
 
     }
 
-    /**
-     * 每一横行的view
-     */
-    private val itemHorizontalLayout = LinearLayout(mContext)
-
-    /**
-     * 包裹横行的纵行view
-     */
-    private val verticalLayout = LinearLayout(mContext)
-
     override fun setDivide(divide: Int) {
         nineGridConfig.setDivide(divide)
     }
@@ -258,7 +245,7 @@ class NineGridView @JvmOverloads constructor(
         val perLineCount = getPerLineCount()
         var width = MeasureSpec.getSize(widthMeasureSpec)
         var height = 0
-        var totalWidth = width - paddingLeft - paddingRight
+        val totalWidth = width - paddingLeft - paddingRight
         val imageList = adapter?.getImageList()
         val singleWidth = getSingleWidth()
         val imageRatio = getSingleImageRatio()
@@ -292,8 +279,8 @@ class NineGridView @JvmOverloads constructor(
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
-        Log.d(TAG, "onLayout 获取宽度：" + width)
-        Log.d(TAG, "onLayout 获取高度：" + height)
+//        Log.d(TAG, "onLayout 获取宽度：" + width)
+//        Log.d(TAG, "onLayout 获取高度：" + height)
 
         /**
          * 需要在此处添加view
@@ -303,9 +290,9 @@ class NineGridView @JvmOverloads constructor(
         val divide = getDivide()
         val perLineCount = getPerLineCount()
 
-        Log.d(TAG, "看看divide的值：" + divide)
-        Log.d(TAG, "看看itemWidth的值：" + itemWidth)
-        Log.d(TAG, "看看itemHeight的值：" + itemHeight)
+//        Log.d(TAG, "看看divide的值：" + divide)
+//        Log.d(TAG, "看看itemWidth的值：" + itemWidth)
+//        Log.d(TAG, "看看itemHeight的值：" + itemHeight)
 
         val imageList = adapter?.getImageList()
         imageList?.forEachIndexed { index, item ->
@@ -313,16 +300,16 @@ class NineGridView @JvmOverloads constructor(
 
             val rowNumber: Int = index / perLineCount
             val columnNumber: Int = index % perLineCount
-            val left = ((itemWidth ?: 0) + divide) * columnNumber + paddingLeft
-            val top = ((itemHeight ?: 0) + divide) * rowNumber + paddingTop
-            val right = left + (itemWidth ?: 0)
-            val bottom = top + (itemHeight ?: 0)
-            Log.d(TAG, "left的值：" + left)
-            Log.d(TAG, "top的值：" + top)
-            Log.d(TAG, "right的值：" + right)
-            Log.d(TAG, "bottom的值：" + bottom)
+            val mLeft = ((itemWidth ?: 0) + divide) * columnNumber + paddingLeft
+            val mTop = ((itemHeight ?: 0) + divide) * rowNumber + paddingTop
+            val mRight = mLeft + (itemWidth ?: 0)
+            val mBottom = mTop + (itemHeight ?: 0)
+//            Log.d(TAG, "left的值：" + mLeft)
+//            Log.d(TAG, "top的值：" + mTop)
+//            Log.d(TAG, "right的值：" + mRight)
+//            Log.d(TAG, "bottom的值：" + mBottom)
 
-            itemView.layout(left, top, right, bottom)
+            itemView.layout(mLeft, mTop, mRight, mBottom)
 
             loadFrame?.displayImage(context, item.getPath(), itemView)
 
@@ -338,7 +325,9 @@ class NineGridView @JvmOverloads constructor(
                 itemView = viewList[position]
             } else {
                 itemView =
-                    adapter?.onCreateView(position, nineGridConfig) ?: RippleImageView(context)
+                    adapter?.onCreateView(position, nineGridConfig) ?: RippleImageView(
+                        context
+                    )
                 itemView.setOnClickListener { view ->
                     nineItemListener?.onClickListener(
                         view,

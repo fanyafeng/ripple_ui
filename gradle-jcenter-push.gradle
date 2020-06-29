@@ -100,7 +100,7 @@ bintray {
     dryRun = false
     publish = true
     pkg {
-        repo = 'maven'
+        repo = 'ripple'
         name = POM_ARTIFACT_ID
         desc = POM_NAME
         websiteUrl = POM_URL
