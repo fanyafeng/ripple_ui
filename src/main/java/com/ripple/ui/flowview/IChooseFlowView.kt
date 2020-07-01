@@ -21,4 +21,15 @@ interface IChooseFlowView : Serializable {
      * 最大的选取数量，默认为1
      */
     fun getMaxChooseCount(): Int
+
+    /**
+     * 获取最小选取数量
+     */
+    fun getMinChooseCount(): Int
+
+    /**
+     * 设置最小选取数量
+     * 默认为0，并且最大数量不能小于最小数量，但是可以相等
+     */
+    fun setMinChooseCount(minCount: Int)
 }

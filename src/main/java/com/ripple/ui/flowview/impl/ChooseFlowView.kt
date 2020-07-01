@@ -4,7 +4,9 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import com.ripple.tool.kttypelians.OnItemModelClickListener
+import com.ripple.tool.kttypelians.PentaLambda
 import com.ripple.tool.kttypelians.QuadraLambda
+import com.ripple.tool.kttypelians.TripleLambda
 import com.ripple.ui.flowview.IChooseFlowView
 import com.ripple.ui.flowview.IChooseModel
 import java.util.*
@@ -44,11 +46,13 @@ class ChooseFlowView @JvmOverloads constructor(
      * 所有的点击回调
      * 会有一个标记是否可点击的字段
      */
-    var onItemClickListener: QuadraLambda<View, Int, IChooseModel, Boolean> = null
+    var onItemClickListener: PentaLambda<View, Int, IChooseModel, Boolean, Boolean> = null
 
     private var position = -1
 
     private var maxCount = 1
+
+    private var minCount = 0
 
     private var selectList = LinkedList<Int>()
 
@@ -163,13 +167,24 @@ class ChooseFlowView @JvmOverloads constructor(
 
             val isCheckable: Boolean
 
+            /**
+             * 小于最小数量想取消选中但是不可以
+             * 标记为重复选取，不相应操作
+             */
+            var checkRepeat = true
+
             if (itemView.isCheckable()) {
                 isCheckable = true
                 val mCount = selectList.size
                 if (itemView.isChecked()) {
                     //取消选中
-                    selectList.remove(pos)
-                    itemView.toggle()
+                    if (mCount <= minCount) {
+                        //当用户选取数量小于最小数量时不允许取消选中
+                        checkRepeat = false
+                    } else {
+                        selectList.remove(pos)
+                        itemView.toggle()
+                    }
                 } else {
                     if (mCount >= maxCount) {
                         //取消第一个加入最后一个
@@ -190,7 +205,7 @@ class ChooseFlowView @JvmOverloads constructor(
                 onItemUnableClickListener?.invoke(it, pos, model)
             }
 
-            onItemClickListener?.invoke(it, pos, model, isCheckable)
+            onItemClickListener?.invoke(it, pos, model, isCheckable, checkRepeat)
 
 
         }
@@ -207,6 +222,14 @@ class ChooseFlowView @JvmOverloads constructor(
 
     override fun getMaxChooseCount(): Int {
         return maxCount
+    }
+
+    override fun getMinChooseCount(): Int {
+        return minCount
+    }
+
+    override fun setMinChooseCount(minCount: Int) {
+        this.minCount = minCount
     }
 
 
