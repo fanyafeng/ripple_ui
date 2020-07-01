@@ -9,8 +9,7 @@ import java.io.Serializable
  * Email: fanyafeng@live.cn
  * Description: 流式布局的行为
  */
-interface IFlowView:Serializable {
-
+interface IFlowView : Serializable {
 
 
     /**
@@ -22,7 +21,7 @@ interface IFlowView:Serializable {
     /**
      * 流式布局Gravity位置显示
      */
-    enum class FlowViewGravity{
+    enum class FlowViewGravity {
         LEFT,
         CENTER,
         RIGHT

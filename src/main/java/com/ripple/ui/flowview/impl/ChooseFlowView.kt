@@ -3,12 +3,9 @@ package com.ripple.ui.flowview.impl
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
-import com.ripple.tool.kttypelians.OnItemClickListener
 import com.ripple.tool.kttypelians.OnItemModelClickListener
-import com.ripple.tool.kttypelians.SuccessLambda
-import com.ripple.tool.kttypelians.TripleLambda
+import com.ripple.tool.kttypelians.QuadraLambda
 import com.ripple.ui.flowview.IChooseFlowView
-import com.ripple.ui.flowview.IChooseItemView
 import com.ripple.ui.flowview.IChooseModel
 import java.util.*
 
@@ -17,7 +14,14 @@ import java.util.*
  * Author: fanyafeng
  * Data: 2020/6/28 19:46
  * Email: fanyafeng@live.cn
- * Description:
+ * Description: taglistview具体实现类
+ *
+ * 1.包含可点击，不可点击，所有点击的回调
+ * 2.获取用户点击回调
+ * 3.设置最大选取数量
+ *  选取的替换逻辑为当数量达到最大值时会取消掉第一个，内部维护的为一个有序数组
+ *  每次都加到最后，如果达到阈值则取消第一个否则继续添加选中项
+ *
  */
 class ChooseFlowView @JvmOverloads constructor(
     val mContext: Context,
@@ -26,9 +30,21 @@ class ChooseFlowView @JvmOverloads constructor(
 ) :
     FlowView(mContext, attrs, defStyleAttr), IChooseFlowView {
 
-    var onItemClickListener: OnItemModelClickListener<IChooseModel> = null
+    /**
+     * 可选项的点击回调
+     */
+    var onItemAbleClickListener: OnItemModelClickListener<IChooseModel> = null
 
+    /**
+     * 不可选项的点击回调
+     */
     var onItemUnableClickListener: OnItemModelClickListener<IChooseModel> = null
+
+    /**
+     * 所有的点击回调
+     * 会有一个标记是否可点击的字段
+     */
+    var onItemClickListener: QuadraLambda<View, Int, IChooseModel, Boolean> = null
 
     private var position = -1
 
@@ -116,7 +132,12 @@ class ChooseFlowView @JvmOverloads constructor(
      * 填充数据
      * 一般都是动态填充
      */
-    fun <T : ChooseItemView, M : IChooseModel> addItemView(itemView: T, model: M) {
+    @JvmOverloads
+    fun <T : ChooseItemView, M : IChooseModel> addItemView(
+        itemView: T,
+        model: M,
+        params: LayoutParams? = null
+    ) {
         position++
         allModelList.add(model)
         itemView.initData(model)
@@ -124,7 +145,10 @@ class ChooseFlowView @JvmOverloads constructor(
         itemView.setOnClickListener {
             val pos = it.tag as Int
 
+            var isCheckable = false
+
             if (itemView.isCheckable()) {
+                isCheckable = true
                 itemView.toggle()
                 val mCount = selectList.size
 
@@ -136,15 +160,21 @@ class ChooseFlowView @JvmOverloads constructor(
                 } else {
                     selectList.addLast(pos)
                 }
-                onItemClickListener?.invoke(it, pos, model)
+                onItemAbleClickListener?.invoke(it, pos, model)
             } else {
+                isCheckable = false
                 onItemUnableClickListener?.invoke(it, pos, model)
             }
 
+            onItemClickListener?.invoke(it, pos, model, isCheckable)
 
 
         }
-        addView(itemView)
+        if (params != null) {
+            addView(itemView, params)
+        } else {
+            addView(itemView)
+        }
     }
 
     override fun setMaxChooseCount(maxCount: Int) {
