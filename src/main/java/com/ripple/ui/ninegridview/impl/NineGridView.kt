@@ -5,6 +5,7 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
+import com.ripple.tool.kttypelians.TripleLambda
 import com.ripple.ui.widget.RippleImageView
 import com.ripple.ui.ninegridview.*
 
@@ -114,8 +115,10 @@ class NineGridView @JvmOverloads constructor(
 
     /**
      * 回调监听
+     * 为了简便添加了kt的点击回调lambda
+     * 长按就按照正常的java调用就可以
      */
-    var onItemClickListener: NineItemListener? = null
+    var onItemClickListener: TripleLambda<View, NineItem, Int> = null
 
     /**
      * 属性配置
@@ -221,9 +224,11 @@ class NineGridView @JvmOverloads constructor(
 
             if (adapter?.getImageList()?.size ?: 0 > maxSize) {
                 val lastItem = getChildAt(maxSize - 1)
-                if (lastItem is RippleImageView) {
-                    lastItem.hintText = (adapter?.getImageList()?.size ?: 0 - maxSize).toString()
-                }
+//                if (lastItem is RippleImageView) {
+//                    val trueCount = adapter?.getImageList()?.size ?: 0
+//                    val excessCount = trueCount - maxSize
+//                    lastItem.hintText = "+$excessCount"
+//                }
             }
 
             mImageList = imageList
@@ -296,23 +301,23 @@ class NineGridView @JvmOverloads constructor(
 
         val imageList = adapter?.getImageList()
         imageList?.forEachIndexed { index, item ->
-            val itemView = getChildAt(index) as RippleImageView
-
-            val rowNumber: Int = index / perLineCount
-            val columnNumber: Int = index % perLineCount
-            val mLeft = ((itemWidth ?: 0) + divide) * columnNumber + paddingLeft
-            val mTop = ((itemHeight ?: 0) + divide) * rowNumber + paddingTop
-            val mRight = mLeft + (itemWidth ?: 0)
-            val mBottom = mTop + (itemHeight ?: 0)
+            val itemView = getChildAt(index)
+            if (itemView != null) {
+                val rowNumber: Int = index / perLineCount
+                val columnNumber: Int = index % perLineCount
+                val mLeft = ((itemWidth ?: 0) + divide) * columnNumber + paddingLeft
+                val mTop = ((itemHeight ?: 0) + divide) * rowNumber + paddingTop
+                val mRight = mLeft + (itemWidth ?: 0)
+                val mBottom = mTop + (itemHeight ?: 0)
 //            Log.d(TAG, "left的值：" + mLeft)
 //            Log.d(TAG, "top的值：" + mTop)
 //            Log.d(TAG, "right的值：" + mRight)
 //            Log.d(TAG, "bottom的值：" + mBottom)
 
-            itemView.layout(mLeft, mTop, mRight, mBottom)
+                (itemView as RippleImageView).layout(mLeft, mTop, mRight, mBottom)
 
-            loadFrame?.displayImage(context, item.getPath(), itemView)
-
+                loadFrame?.displayImage(context, item.getPath(), itemView)
+            }
         }
     }
 
@@ -334,6 +339,8 @@ class NineGridView @JvmOverloads constructor(
                         model,
                         position
                     )
+
+                    onItemClickListener?.invoke(view, model, position)
                 }
 
                 itemView.setOnLongClickListener { view: View ->

@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.RectF
 import android.graphics.drawable.Drawable
 import android.text.Layout
 import android.text.StaticLayout
@@ -11,6 +12,7 @@ import android.text.TextPaint
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import com.ripple.tool.density.dp2pxF
 
 /**
  * Author: fanyafeng
@@ -20,10 +22,10 @@ import android.view.View
  */
 
 open class RippleImageView @JvmOverloads constructor(
-    context: Context,
+    private val mContext: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
-) : androidx.appcompat.widget.AppCompatImageView(context, attrs, defStyleAttr) {
+) : androidx.appcompat.widget.AppCompatImageView(mContext, attrs, defStyleAttr) {
 
     companion object {
         private val TAG = RippleImageView::class.java.simpleName
@@ -52,6 +54,8 @@ open class RippleImageView @JvmOverloads constructor(
         this.onRippleImageViewListener = onRippleImageViewListener
     }
 
+    var roundRadio = 0F
+
     var hintText: String? = null
         set(value) {
             field = value
@@ -63,13 +67,17 @@ open class RippleImageView @JvmOverloads constructor(
         }
 
     private var paint: TextPaint? = null
+    private var shadePaint: Paint? = null
     private var currentLayout: StaticLayout? = null
+    private val roundRect = RectF()
 
     init {
         paint = TextPaint(Paint.ANTI_ALIAS_FLAG)
         paint?.isAntiAlias = true
         paint?.color = Color.WHITE
         paint?.textSize = 120F
+        shadePaint = Paint(Paint.ANTI_ALIAS_FLAG)
+        shadePaint?.isAntiAlias = true
     }
 
     override fun onDetachedFromWindow() {
@@ -117,7 +125,12 @@ open class RippleImageView @JvmOverloads constructor(
                 false
             )
             currentLayout?.let {
-                canvas?.drawColor(Color.parseColor("#66000000"))
+//                canvas?.drawColor(Color.parseColor("#66000000"))
+                roundRect.set(0F, 0F, width.toFloat(), height.toFloat())
+                shadePaint?.color = Color.parseColor("#66000000")
+                shadePaint?.let { shadePaintItem ->
+                    canvas?.drawRoundRect(roundRect, roundRadio, roundRadio, shadePaintItem)
+                }
                 canvas?.translate(0F, (height - it.height).toFloat() / 2)
                 it.draw(canvas)
                 canvas?.translate(0F, -(height - it.height).toFloat() / 2)

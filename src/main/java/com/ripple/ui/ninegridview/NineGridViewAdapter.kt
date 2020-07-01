@@ -16,17 +16,17 @@ abstract class NineGridViewAdapter @JvmOverloads constructor(
     private var list: List<NineItem> = mutableListOf()
 ) : Serializable {
 
-    fun onCreateView(position: Int, nineGrid: NineGrid): RippleImageView {
+    open fun onCreateView(position: Int, nineGrid: NineGrid): RippleImageView {
         //position一般用于最后一个ImageView的显示
         val itemView = RippleImageView(mContext)
         itemView.scaleType = ImageView.ScaleType.CENTER_CROP
         return itemView
     }
 
-    fun setImageList(list: List<NineItem>) {
+    open fun setImageList(list: List<NineItem>) {
         this.list = list
     }
 
-    fun getImageList(): List<NineItem> = list
+    open fun getImageList(): List<NineItem> = list
 
 }
