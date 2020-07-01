@@ -9,6 +9,7 @@ import com.ripple.tool.kttypelians.QuadraLambda
 import com.ripple.tool.kttypelians.TripleLambda
 import com.ripple.ui.flowview.IChooseFlowView
 import com.ripple.ui.flowview.IChooseModel
+import java.lang.Exception
 import java.util.*
 
 
@@ -217,6 +218,8 @@ class ChooseFlowView @JvmOverloads constructor(
     }
 
     override fun setMaxChooseCount(maxCount: Int) {
+        if (maxCount < minCount)
+            throw Exception("最大选取数量不可以小于最小选取数量")
         this.maxCount = maxCount
     }
 
@@ -229,6 +232,8 @@ class ChooseFlowView @JvmOverloads constructor(
     }
 
     override fun setMinChooseCount(minCount: Int) {
+        if (maxCount < minCount)
+            throw Exception("最大选取数量不可以小于最小选取数量")
         this.minCount = minCount
     }
 
