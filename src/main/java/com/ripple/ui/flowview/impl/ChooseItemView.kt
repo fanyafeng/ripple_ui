@@ -54,7 +54,6 @@ open class ChooseItemView @JvmOverloads constructor(
     }
 
 
-
     fun <T : IChooseModel> initData(model: T) {
         rippleChooseItemView.text = model.getChooseItemTitle()
         setCheckable(model.getChooseItemCheckable())
@@ -139,4 +138,6 @@ open class ChooseItemView @JvmOverloads constructor(
     fun setInnerTagPadding(left: Int, top: Int, right: Int, bottom: Int) {
         rippleChooseItemView.setPadding(left, top, right, bottom)
     }
+
+    fun getTagView() = rippleChooseItemView
 }

@@ -75,11 +75,13 @@ class ChooseFlowView @JvmOverloads constructor(
      * 获取选中的结果
      */
     fun getSelectedResult(): List<IChooseModel> {
+        resultList.clear()
+//        println("已选中：" + selectList.toString())
         allModelList.forEachIndexed { index, iChooseModel ->
             if (selectList.contains(index)) {
                 resultList.add(iChooseModel)
 //                println("标志位：" + index)
-//                println(iChooseModel.getChooseItemTitle())
+//                println("标志位title:" + iChooseModel.getChooseItemTitle())
             }
         }
         return resultList
@@ -142,23 +144,45 @@ class ChooseFlowView @JvmOverloads constructor(
         allModelList.add(model)
         itemView.initData(model)
         itemView.tag = position
+
+        val initCount = selectList.size
+
+        if (model.getChooseItemChecked()) {
+            if (initCount >= maxCount) {
+                val first = selectList.first
+                (getChildAt(first) as ChooseItemView).toggle()
+                selectList.removeFirst()
+                selectList.addLast(position)
+            } else {
+                selectList.addLast(position)
+            }
+        }
+
         itemView.setOnClickListener {
             val pos = it.tag as Int
 
-            var isCheckable = false
+            val isCheckable: Boolean
 
             if (itemView.isCheckable()) {
                 isCheckable = true
-                itemView.toggle()
                 val mCount = selectList.size
-
-                if (mCount >= maxCount) {
-                    val first = selectList.first
-                    (getChildAt(first) as ChooseItemView).toggle()
-                    selectList.removeFirst()
-                    selectList.addLast(pos)
+                if (itemView.isChecked()) {
+                    //取消选中
+                    selectList.remove(pos)
+                    itemView.toggle()
                 } else {
-                    selectList.addLast(pos)
+                    if (mCount >= maxCount) {
+                        //取消第一个加入最后一个
+                        val first = selectList.first
+                        (getChildAt(first) as ChooseItemView).toggle()
+                        itemView.toggle()
+                        selectList.removeFirst()
+                        selectList.addLast(pos)
+                    } else {
+                        //添加选中
+                        itemView.toggle()
+                        selectList.addLast(pos)
+                    }
                 }
                 onItemAbleClickListener?.invoke(it, pos, model)
             } else {
@@ -184,5 +208,6 @@ class ChooseFlowView @JvmOverloads constructor(
     override fun getMaxChooseCount(): Int {
         return maxCount
     }
+
 
 }
