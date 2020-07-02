@@ -27,4 +27,9 @@ interface IChooseModel : Serializable {
      * 是否被选中
      */
     fun getChooseItemChecked(): Boolean
+
+    /**
+     * 当有最大选取数量时控件会根据FIFO更新data model
+     */
+    fun setChooseItemChecked(isChecked: Boolean)
 }

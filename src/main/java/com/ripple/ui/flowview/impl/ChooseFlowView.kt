@@ -92,6 +92,8 @@ class ChooseFlowView @JvmOverloads constructor(
         return resultList
     }
 
+    fun getAllDataList() = allModelList
+
     /**
      * 更新当前的view
      * 为了不去每次都添加删除单个的view
@@ -103,27 +105,35 @@ class ChooseFlowView @JvmOverloads constructor(
         val oldCount = allModelList.size
         if (newCount == oldCount) {
             list.forEachIndexed { index, model ->
+                val chooseModel = model.first
+                updateSelectList(index, chooseModel)
                 //更新原有的model列表
-                allModelList[index] = model.first
+                allModelList[index] = chooseModel
                 //更新原有的view显示
-                (getChildAt(index) as ChooseItemView).initData(model.first)
+                (getChildAt(index) as ChooseItemView).initData(chooseModel)
             }
         } else if (newCount > oldCount) {
             list.forEachIndexed { index, model ->
+                val chooseModel = model.first
+                updateSelectList(index, chooseModel)
                 //新数据与原数据重叠部分
                 if (index < oldCount) {
-                    allModelList[index] = model.first
-                    (getChildAt(index) as ChooseItemView).initData(model.first)
+                    allModelList[index] = chooseModel
+                    (getChildAt(index) as ChooseItemView).initData(chooseModel)
                 } else {
-                    addItemView(model.second, model.first)
+                    addItemView(model.second, chooseModel)
                 }
             }
         } else {
             list.forEachIndexed { index, model ->
+                val chooseModel = model.first
+                updateSelectList(index, chooseModel)
                 //更新原有的model列表
-                allModelList[index] = model.first
+                allModelList[index] = chooseModel
                 //更新原有的view显示
-                (getChildAt(index) as ChooseItemView).initData(model.first)
+                (getChildAt(index) as ChooseItemView).initData(chooseModel)
+                //更新选中态
+                setItemCheckStatus(index,true)
             }
 
             (newCount until oldCount).forEach {
@@ -131,7 +141,46 @@ class ChooseFlowView @JvmOverloads constructor(
                 removeViewAt(it)
             }
         }
+    }
 
+    /**
+     * 更新选中列表
+     * 正常情况应该是外部控制，但是因为显示的问题内部进行了重新的筛选
+     * 按理说控件不能修改用户的datamodel，可是如果用户传入的数据有问题的话需要用户自己去检查
+     * 此时控件会更新数据的选中态
+     * 但是本地选中的结果是正常的，算法是FIFO
+     * 所以在此时获取的选择用户是完全可以信任的
+     */
+    private fun updateSelectList(selectPosition: Int, chooseModel: IChooseModel) {
+        val initCount = selectList.size
+        //先去判断当前item是否是选中状态
+        if (chooseModel.getChooseItemChecked()) {
+            //如果是选中状态，并且被选中的数量大于最大的可选数量
+            if (initCount >= maxCount) {
+                //首先更新被选中的第一个数据model
+                setItemCheckStatus(selectList.first,false)
+                //取消选中还需要更新控件状态
+                (getChildAt(selectList.first) as ChooseItemView).toggle()
+                //此时需要把第一个item删除
+                selectList.removeFirst()
+
+                //同时将选中状态的item添加到选中列表的最后位置
+                //以下同理
+                selectList.addLast(selectPosition)
+                //此时更新被选中态item
+                setItemCheckStatus(selectPosition,true)
+            } else {
+                selectList.addLast(selectPosition)
+                setItemCheckStatus(selectPosition,true)
+            }
+        }
+    }
+
+    /**
+     * 更新data model的选中状态
+     */
+    private fun setItemCheckStatus(position: Int, isChecked: Boolean) {
+        allModelList[position].setChooseItemChecked(isChecked)
     }
 
 
@@ -156,8 +205,10 @@ class ChooseFlowView @JvmOverloads constructor(
             if (initCount >= maxCount) {
                 val first = selectList.first
                 (getChildAt(first) as ChooseItemView).toggle()
+                setItemCheckStatus(selectList.first,false)
                 selectList.removeFirst()
                 selectList.addLast(position)
+                setItemCheckStatus(position,true)
             } else {
                 selectList.addLast(position)
             }
@@ -184,6 +235,7 @@ class ChooseFlowView @JvmOverloads constructor(
                         checkRepeat = false
                     } else {
                         selectList.remove(pos)
+                        setItemCheckStatus(pos,false)
                         itemView.toggle()
                     }
                 } else {
@@ -192,12 +244,15 @@ class ChooseFlowView @JvmOverloads constructor(
                         val first = selectList.first
                         (getChildAt(first) as ChooseItemView).toggle()
                         itemView.toggle()
+                        setItemCheckStatus(selectList.first,false)
                         selectList.removeFirst()
                         selectList.addLast(pos)
+                        setItemCheckStatus(pos,true)
                     } else {
                         //添加选中
                         itemView.toggle()
                         selectList.addLast(pos)
+                        setItemCheckStatus(pos,true)
                     }
                 }
                 onItemAbleClickListener?.invoke(it, pos, model)

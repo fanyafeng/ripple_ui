@@ -15,7 +15,7 @@ import com.ripple.ui.widget.RippleImageView
  * Description: 九宫格实例adapter
  * 以下为demo可以据此进行改版
  */
-class NineGridAdapter(
+open class NineGridAdapter(
     private val mContext: Context,
     private val list: List<NineItem>,
     private val maxCount: Int
