@@ -36,5 +36,4 @@ interface IChooseItemView:Serializable {
      */
     fun toggle()
 
-
 }
