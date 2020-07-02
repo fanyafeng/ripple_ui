@@ -44,7 +44,7 @@ open class ChooseItemView @JvmOverloads constructor(
     /**
      * 标签内部字体的三种颜色
      */
-    var unselectableTagColor = Color.BLACK
+    var unselectableTagColor = Color.parseColor("#cccccc")
     var selectedTagColor = Color.parseColor("#ff680a")
     var unselectedTagColor = Color.BLACK
 
