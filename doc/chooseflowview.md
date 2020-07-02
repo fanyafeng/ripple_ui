@@ -1,6 +1,8 @@
 # 标签列表选择view：ChooseFlowView
 [移步到源代码github托管地址](https://github.com/fanyafeng/ripple_ui)
+
 主要是针对不规则`ITEM TAG`标签的流式`LIST`布局，如果是规则的用`Recyclerview`就可以完全胜任了，而且还会有很好的内存管理，但是不规则的就需要自己来写了，因为文章可能比较长，这里先放一下效果图，在说之前有个大体的了解。
+
 ![标签列表view动图](https://github.com/1181631922/ModuleSample/blob/master/ripple_ui/pic/chooseflowview.gif)
 
 ## 一、引入使用
