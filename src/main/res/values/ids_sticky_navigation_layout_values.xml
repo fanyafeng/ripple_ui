@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="stickyNavigationLayoutTopView" type="id" />
+    <item name="stickyNavigationLayoutViewPager" type="id" />
+    <item name="stickyNavigationLayoutIndicator" type="id" />
+    <item name="stickyNavigationLayoutScrollview" type="id" />
+</resources>

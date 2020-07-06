@@ -3,7 +3,7 @@
 
 主要是针对不规则`ITEM TAG`标签的流式`LIST`布局，如果是规则的用`Recyclerview`就可以完全胜任了，而且还会有很好的内存管理，但是不规则的就需要自己来写了，因为文章可能比较长，这里先放一下效果图，在说之前有个大体的了解。
 
-![标签列表view动图](https://github.com/1181631922/ModuleSample/blob/master/ripple_ui/pic/chooseflowview.gif)
+![标签列表view动图](https://github.com/fanyafeng/ripple_ui/blob/master/pic/chooseflowview.gif)
 
 ## 一、引入使用
 本来想再单独写一篇文章介绍使用的，但是接入比较简单，就直接说了
@@ -219,6 +219,7 @@ fun <T : ChooseItemView, M : IChooseModel> addItemView(
 2. 以上数据筛选完成后便初始化页面，此时页面是按照用户的要求展示的，并且此时获取的结果是可靠的，而且是符合要求的
 3. 涉及到用户点击操作时，当需要有多选，单选，反选的情况时可以去设置最大数量，最小数量来控制**（PS:后面可以添加是否支持反选，但是感觉意义不大暂时先搁置）**
 4. 更新`ChooseFlowView`，更新页面时会重新筛选选中数据，这里有三种情况，新数据大于，等于，小于旧数据，相等的话是最好处理的，只需要更新`data list`刷新页面即可，小于的话需要将多余的`view`进行`remove`同时刷新页面，大于的话就需要去新建`ITEM`再将其加入到`ChooseFlowView`中
+
 ### 3.4 核心代码
 #### 3.4.1 初始化数据
 
