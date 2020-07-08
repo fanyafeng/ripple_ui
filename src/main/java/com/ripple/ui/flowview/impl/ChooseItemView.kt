@@ -177,11 +177,4 @@ open class ChooseItemView @JvmOverloads constructor(
     }
 
     fun getTagView() = rippleChooseItemView
-
-    fun setTagHeight() {
-        rippleChooseItemView.height = 60.dp2px
-        invalidate()
-    }
-
-    fun getTagLayoutView() = rippleChooseItemViewLayout
 }
