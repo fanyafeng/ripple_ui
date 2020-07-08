@@ -276,8 +276,19 @@ class NineGridView @JvmOverloads constructor(
                 width =
                     it * perLineCount + divide * (perLineCount - 1) + paddingLeft + paddingRight
             }
+            val perLineCount = getPerLineCount()
+            val maxSize = getMaxLine() * getPerLineCount()
+            var size = adapter?.getImageList()?.size ?: 0
+            if (size > maxSize) {
+                size = maxSize
+            }
+            val needLine = if (size % perLineCount == 0) {
+                size / perLineCount
+            } else {
+                size / perLineCount + 1
+            }
             itemHeight?.let {
-                height = it * currentLine + divide * (currentLine - 1) + paddingTop + paddingBottom
+                height = it * needLine + divide * (needLine - 1) + paddingTop + paddingBottom
             }
         }
         setMeasuredDimension(width, height)
