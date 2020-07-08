@@ -3,11 +3,13 @@ package com.ripple.ui.flowview.impl
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
+import android.widget.Checkable
 import com.ripple.tool.kttypelians.OnItemModelClickListener
 import com.ripple.tool.kttypelians.PentaLambda
 import com.ripple.tool.kttypelians.QuadraLambda
 import com.ripple.tool.kttypelians.TripleLambda
 import com.ripple.ui.flowview.IChooseFlowView
+import com.ripple.ui.flowview.IChooseItemView
 import com.ripple.ui.flowview.IChooseModel
 import java.lang.Exception
 import java.util.*
@@ -103,37 +105,71 @@ class ChooseFlowView @JvmOverloads constructor(
         selectList.clear()
         val newCount = list.size
         val oldCount = allModelList.size
+
         if (newCount == oldCount) {
+            /**
+             * 如果新旧数据个数相同
+             */
             list.forEachIndexed { index, model ->
                 val chooseModel = model.first
-                updateSelectList(index, chooseModel)
                 //更新原有的model列表
                 allModelList[index] = chooseModel
+                updateSelectList(index, chooseModel)
+                //获取原有的itemView
+                val oldItemView = getChildAt(index) as ChooseItemView
+                //获取新的itemView
+                val newItemView = model.second
+                //更新tag，方法内进行封装
+                if (newItemView != null) {
+                    oldItemView.updateStatus(newItemView)
+                }
                 //更新原有的view显示
-                (getChildAt(index) as ChooseItemView).initData(chooseModel)
+                oldItemView.initData(chooseModel)
             }
         } else if (newCount > oldCount) {
+            /**
+             * 如果新数据比旧数据个数多
+             */
             list.forEachIndexed { index, model ->
                 val chooseModel = model.first
-                updateSelectList(index, chooseModel)
                 //新数据与原数据重叠部分
                 if (index < oldCount) {
                     allModelList[index] = chooseModel
-                    (getChildAt(index) as ChooseItemView).initData(chooseModel)
+                    updateSelectList(index, chooseModel)
+                    //获取新的itemView
+                    val newItemView = model.second
+                    //获取原有的itemView
+                    val oldItemView = getChildAt(index) as ChooseItemView
+                    //更新tag，方法内进行封装
+                    if (newItemView != null) {
+                        oldItemView.updateStatus(newItemView)
+                    }
+                    //更新原有的view显示
+                    oldItemView.initData(chooseModel)
                 } else {
-                    addItemView(model.second, chooseModel)
+                    if (model.second != null) {
+                        addItemView(model.second, chooseModel)
+                    }
                 }
             }
         } else {
             list.forEachIndexed { index, model ->
                 val chooseModel = model.first
-                updateSelectList(index, chooseModel)
                 //更新原有的model列表
                 allModelList[index] = chooseModel
+                updateSelectList(index, chooseModel)
+                //获取原有的itemView
+                val oldItemView = getChildAt(index) as ChooseItemView
+                //获取新的itemView
+                val newItemView = model.second
+                //更新tag，方法内进行封装
+                if (newItemView != null) {
+                    oldItemView.updateStatus(newItemView)
+                }
                 //更新原有的view显示
-                (getChildAt(index) as ChooseItemView).initData(chooseModel)
+                oldItemView.initData(chooseModel)
                 //更新选中态
-                setItemCheckStatus(index,true)
+                setItemCheckStatus(index, true)
             }
 
             (newCount until oldCount).forEach {
@@ -151,30 +187,62 @@ class ChooseFlowView @JvmOverloads constructor(
      * 但是本地选中的结果是正常的，算法是FIFO
      * 所以在此时获取的选择用户是完全可以信任的
      */
-    private fun updateSelectList(selectPosition: Int, chooseModel: IChooseModel) {
+    @JvmOverloads
+    private fun updateSelectList(
+        selectPosition: Int,
+        chooseModel: IChooseModel,
+        isUpdateData: Boolean = true
+    ) {
         val initCount = selectList.size
-        //先去判断当前item是否是选中状态
-        if (chooseModel.getChooseItemChecked()) {
-            //如果是选中状态，并且被选中的数量大于最大的可选数量
-            if (initCount >= maxCount) {
-                //首先更新被选中的第一个数据model
-                setItemCheckStatus(selectList.first,false)
-                //取消选中还需要更新控件状态
-                (getChildAt(selectList.first) as ChooseItemView).toggle()
-                //此时需要把第一个item删除
-                selectList.removeFirst()
+        //首先去判断是否是可选装态
+        if (chooseModel.getChooseItemCheckable()) {
+            setItemCheckableStatus(selectPosition, true)
+            //然后去判断当前item是否是选中状态
+            if (chooseModel.getChooseItemChecked()) {
+                //如果是选中状态，并且被选中的数量大于最大的可选数量
+                if (initCount >= maxCount) {
+                    //首先更新被选中的第一个数据model
+                    setItemCheckStatus(selectList.first, false)
+                    //取消选中还需要更新控件状态
+                    (getChildAt(selectList.first) as ChooseItemView).toggle()
+                    //此时需要把第一个item删除
+                    selectList.removeFirst()
 
-                //同时将选中状态的item添加到选中列表的最后位置
-                //以下同理
-                selectList.addLast(selectPosition)
-                //此时更新被选中态item
-                setItemCheckStatus(selectPosition,true)
+                    //同时将选中状态的item添加到选中列表的最后位置
+                    //以下同理
+                    selectList.addLast(selectPosition)
+                    //此时更新被选中态item
+                    setItemCheckStatus(selectPosition, true)
+                } else {
+                    selectList.addLast(selectPosition)
+                    setItemCheckStatus(selectPosition, true)
+                }
             } else {
-                selectList.addLast(selectPosition)
-                setItemCheckStatus(selectPosition,true)
+                //如果不是选中状态并且选中的最小数量还小于最小可选数量则不去更新当前列表
+            }
+        } else {
+            //如果是不可选则需要更新当前item
+            setItemCheckableStatus(selectPosition, false)
+        }
+        if (!isUpdateData) {
+            val itemView = getChildAt(selectPosition)
+            if (itemView != null) {
+                (itemView as ChooseItemView).initData(chooseModel)
             }
         }
     }
+
+    fun notifyItem(selectPosition: Int, chooseModel: IChooseModel) {
+        updateSelectList(selectPosition, chooseModel, false)
+    }
+
+    /**
+     * 更新data model为不可选状态
+     */
+    private fun setItemCheckableStatus(position: Int, checkable: Boolean) {
+        allModelList[position].setChooseItemCheckable(checkable)
+    }
+
 
     /**
      * 更新data model的选中状态
@@ -201,16 +269,27 @@ class ChooseFlowView @JvmOverloads constructor(
 
         val initCount = selectList.size
 
-        if (model.getChooseItemChecked()) {
-            if (initCount >= maxCount) {
-                val first = selectList.first
-                (getChildAt(first) as ChooseItemView).toggle()
-                setItemCheckStatus(selectList.first,false)
-                selectList.removeFirst()
-                selectList.addLast(position)
-                setItemCheckStatus(position,true)
-            } else {
-                selectList.addLast(position)
+        if (model.getChooseItemCheckable()) {
+            itemView.setCheckable(true)
+            if (model.getChooseItemChecked()) {
+                if (initCount >= maxCount) {
+                    val first = selectList.first
+                    (getChildAt(first) as ChooseItemView).toggle()
+                    setItemCheckStatus(selectList.first, false)
+                    selectList.removeFirst()
+                    selectList.addLast(position)
+                    setItemCheckStatus(position, true)
+                } else {
+                    selectList.addLast(position)
+                }
+            }
+        } else {
+            itemView.setCheckable(false)
+            /**
+             * 如果不可选但是是选中状态，这时候控件会去校验数据
+             */
+            if (model.getChooseItemChecked()) {
+                model.setChooseItemChecked(false)
             }
         }
 
@@ -235,7 +314,7 @@ class ChooseFlowView @JvmOverloads constructor(
                         checkRepeat = false
                     } else {
                         selectList.remove(pos)
-                        setItemCheckStatus(pos,false)
+                        setItemCheckStatus(pos, false)
                         itemView.toggle()
                     }
                 } else {
@@ -244,15 +323,15 @@ class ChooseFlowView @JvmOverloads constructor(
                         val first = selectList.first
                         (getChildAt(first) as ChooseItemView).toggle()
                         itemView.toggle()
-                        setItemCheckStatus(selectList.first,false)
+                        setItemCheckStatus(selectList.first, false)
                         selectList.removeFirst()
                         selectList.addLast(pos)
-                        setItemCheckStatus(pos,true)
+                        setItemCheckStatus(pos, true)
                     } else {
                         //添加选中
                         itemView.toggle()
                         selectList.addLast(pos)
-                        setItemCheckStatus(pos,true)
+                        setItemCheckStatus(pos, true)
                     }
                 }
                 onItemAbleClickListener?.invoke(it, pos, model)

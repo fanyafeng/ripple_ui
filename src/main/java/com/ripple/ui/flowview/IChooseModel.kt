@@ -1,5 +1,6 @@
 package com.ripple.ui.flowview
 
+import android.widget.Checkable
 import java.io.Serializable
 
 
@@ -32,4 +33,9 @@ interface IChooseModel : Serializable {
      * 当有最大选取数量时控件会根据FIFO更新data model
      */
     fun setChooseItemChecked(isChecked: Boolean)
+
+    /**
+     * 更新是否可点击
+     */
+    fun setChooseItemCheckable(checkable: Boolean)
 }

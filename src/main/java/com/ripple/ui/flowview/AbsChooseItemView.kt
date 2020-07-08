@@ -1,4 +1,4 @@
-package com.ripple.ui.flowview.impl
+package com.ripple.ui.flowview
 
 import android.content.Context
 import android.graphics.Color
@@ -24,7 +24,7 @@ import kotlinx.android.synthetic.main.item_choose_view_layout.view.*
  * 3.内部tag的padding设置
  *
  */
-open class ChooseItemView @JvmOverloads constructor(
+abstract class AbsChooseItemView @JvmOverloads constructor(
     private var mContext: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
@@ -51,12 +51,12 @@ open class ChooseItemView @JvmOverloads constructor(
         initView()
     }
 
-    private fun initView() {
+    fun initView() {
         LayoutInflater.from(mContext).inflate(R.layout.item_choose_view_layout, this)
         rippleChooseItemView.setBackgroundResource(chooseViewUnselected)
     }
 
-    fun <T : ChooseItemView> updateStatus(newItemView: T) {
+    fun <T : AbsChooseItemView> updateStatus(newItemView: T) {
         //将新的itemView的属性赋值到旧的itemView上
         setInnerTagLayoutParams(newItemView.getInnerTagLayoutParams())
         //更新标签选中态背景
@@ -177,11 +177,6 @@ open class ChooseItemView @JvmOverloads constructor(
     }
 
     fun getTagView() = rippleChooseItemView
-
-    fun setTagHeight() {
-        rippleChooseItemView.height = 60.dp2px
-        invalidate()
-    }
 
     fun getTagLayoutView() = rippleChooseItemViewLayout
 }

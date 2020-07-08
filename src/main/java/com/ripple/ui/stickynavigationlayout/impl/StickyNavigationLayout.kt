@@ -9,6 +9,8 @@ import androidx.core.view.NestedScrollingChild
 import androidx.core.view.NestedScrollingParent
 import androidx.core.view.ViewCompat
 import androidx.viewpager.widget.ViewPager
+import com.ripple.log.LogFactory
+import com.ripple.tool.extend.forEach
 import com.ripple.ui.R
 import java.lang.Exception
 
@@ -20,7 +22,7 @@ import java.lang.Exception
  * Description: 吸顶的view
  */
 class StickyNavigationLayout @JvmOverloads constructor(
-    private val mContext: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
+        private val mContext: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : LinearLayout(mContext, attrs, defStyleAttr), NestedScrollingParent {
 
     /**
@@ -117,8 +119,8 @@ class StickyNavigationLayout @JvmOverloads constructor(
          * 给它想要的高度
          */
         getChildAt(0).measure(
-            widthMeasureSpec,
-            MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED)
+                widthMeasureSpec,
+                MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED)
         )
         /**
          * 给定viewpager的高度
@@ -129,9 +131,9 @@ class StickyNavigationLayout @JvmOverloads constructor(
          */
         params?.height = measuredHeight - (containerNavigationView?.measuredHeight ?: 0)
         setMeasuredDimension(
-            measuredWidth,
-            (containerTopView?.measuredHeight ?: 0) + (containerNavigationView?.measuredHeight
-                ?: 0) + (containerViewPager?.measuredHeight ?: 0)
+                measuredWidth,
+                (containerTopView?.measuredHeight ?: 0) + (containerNavigationView?.measuredHeight
+                        ?: 0) + (containerViewPager?.measuredHeight ?: 0)
         )
         /**
          * fix bug if version>7
@@ -197,6 +199,7 @@ class StickyNavigationLayout @JvmOverloads constructor(
      */
     override fun computeScroll() {
         if (overScroller.computeScrollOffset()) {
+            LogFactory.d(this.javaClass, "overScroller.currY:" + overScroller.currY)
             scrollTo(0, overScroller.currY)
             invalidate()
         }

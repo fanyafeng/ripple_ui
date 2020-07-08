@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rippleChooseItemViewLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="5dp">
@@ -9,12 +10,13 @@
         android:layout_width="match_parent"
         android:layout_height="28dp"
         android:layout_centerHorizontal="true"
+        android:ellipsize="end"
         android:gravity="center"
+        android:maxLines="1"
+        android:minWidth="70dp"
         android:paddingLeft="12dp"
         android:paddingRight="12dp"
         android:text="我是标签1"
-        android:maxLines="1"
-        android:ellipsize="end"
         android:textColor="@android:color/black"
         android:textSize="12dp" />
 
