@@ -73,7 +73,7 @@ class FoldView @JvmOverloads constructor(
         descTextView.text = foldViewDesc
         descTextView.ellipsize = TextUtils.TruncateAt.END
         descTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 13.toFloat())
-        descTextView.background = this.background
+        descTextView.setBackgroundColor(Color.TRANSPARENT)
         descTextView.setTextColor(Color.parseColor("#999999"))
         descTextView.layoutParams = LayoutParams(
             LayoutParams.MATCH_PARENT,
@@ -156,7 +156,7 @@ class FoldView @JvmOverloads constructor(
         descTextView.text = foldViewDesc
         post {
             lineCount = descTextView.lineCount
-            descTextView.maxLines = maxLines
+//            descTextView.maxLines = maxLines
         }
         setStatus()
     }
@@ -172,12 +172,28 @@ class FoldView @JvmOverloads constructor(
     private fun setStatus() {
         postDelayed({
             if (descTextView.lineCount > maxLines) {
+                descTextView.maxLines = maxLines
                 if (onlyUnfold) {
                     foldControlTextView.visibility = View.GONE
+                } else {
+                    foldControlTextView.visibility = View.VISIBLE
                 }
+            } else {
+                foldControlTextView.visibility = View.GONE
             }
         }, 10)
     }
 
+    fun getFoldControlTextView() = foldControlTextView
+
+    fun getDescTextView() = descTextView
+
+    fun setFoldControlTextViewBackGroundColor(color: Int) {
+        foldControlTextView.setBackgroundColor(color)
+    }
+
+    fun setDescTextViewBackGroundColor(color: Int) {
+        descTextView.setBackgroundColor(color)
+    }
 
 }
