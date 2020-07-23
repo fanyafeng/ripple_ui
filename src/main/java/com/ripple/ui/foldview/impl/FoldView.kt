@@ -173,11 +173,11 @@ class FoldView @JvmOverloads constructor(
         postDelayed({
             if (descTextView.lineCount > maxLines) {
                 descTextView.maxLines = maxLines
-                if (onlyUnfold) {
-                    foldControlTextView.visibility = View.GONE
-                } else {
-                    foldControlTextView.visibility = View.VISIBLE
-                }
+//                if (onlyUnfold) {
+//                    foldControlTextView.visibility = View.GONE
+//                } else {
+//                    foldControlTextView.visibility = View.VISIBLE
+//                }
             } else {
                 foldControlTextView.visibility = View.GONE
             }
