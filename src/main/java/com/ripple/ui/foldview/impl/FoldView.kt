@@ -12,6 +12,7 @@ import android.view.View
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.ripple.tool.density.dp2px
+import com.ripple.tool.kttypelians.SuccessLambda
 import com.ripple.ui.foldview.IFoldView
 
 
@@ -66,6 +67,13 @@ class FoldView @JvmOverloads constructor(
      * 实际行数
      */
     private var lineCount = 0
+
+    var onOpenLambda: SuccessLambda<Boolean> = null
+
+    var isOpen = !descClose
+        private set(value) {
+            field = value
+        }
 
 
     init {
@@ -131,7 +139,13 @@ class FoldView @JvmOverloads constructor(
                 }
                 descClose = !descClose
             }
+
+            onOpenLambda?.invoke(!descClose)
         }
+    }
+
+    fun reset() {
+
     }
 
     override fun getFoldViewStatus(): Boolean {
@@ -172,6 +186,7 @@ class FoldView @JvmOverloads constructor(
     private fun setStatus() {
         postDelayed({
             if (descTextView.lineCount > maxLines) {
+                foldControlTextView.visibility = View.VISIBLE
                 descTextView.maxLines = maxLines
 //                if (onlyUnfold) {
 //                    foldControlTextView.visibility = View.GONE

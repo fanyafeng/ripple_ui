@@ -17,6 +17,11 @@ interface IFlowView : Serializable {
      */
     fun setGravity(gravity: FlowViewGravity)
 
+    /**
+     * 设置最大行数
+     */
+    fun setMaxLine(maxLine: Int)
+
 
     /**
      * 流式布局Gravity位置显示

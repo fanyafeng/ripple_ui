@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
+import com.ripple.log.tpyeextend.toLogD
 import com.ripple.ui.flowview.IFlowView
 
 
@@ -13,7 +14,11 @@ import com.ripple.ui.flowview.IFlowView
  * Email: fanyafeng@live.cn
  * Description: 流式布局
  */
-open class FlowView @JvmOverloads constructor(private val mContext: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) :
+open class FlowView @JvmOverloads constructor(
+    private val mContext: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
+) :
     ViewGroup(
         mContext,
         attrs,
@@ -40,7 +45,18 @@ open class FlowView @JvmOverloads constructor(private val mContext: Context, att
      */
     private var lineViews: MutableList<View> = arrayListOf()
 
+    /**
+     * 最大显示行数
+     */
+    private var maxLine = -1
+
+    private var maxHeight = 0
+
     var mGravity = IFlowView.FlowViewGravity.LEFT
+
+    init {
+
+    }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         /**
@@ -64,6 +80,11 @@ open class FlowView @JvmOverloads constructor(private val mContext: Context, att
 
 
         val mCount = childCount
+
+        /**
+         * 行数
+         */
+        var lineCount = 1
         (0 until mCount).forEach {
             val child = getChildAt(it)
             if (child.visibility == View.GONE) {
@@ -78,14 +99,32 @@ open class FlowView @JvmOverloads constructor(private val mContext: Context, att
             val childWidth = child.measuredWidth + lp.leftMargin + lp.rightMargin
             val childHeight = child.measuredHeight + lp.topMargin + lp.bottomMargin
 
-            if (lineWidth + childWidth > sizeWidth - paddingLeft - paddingRight) {
-                width = width.coerceAtLeast(lineWidth)
-                lineWidth = childWidth
-                height += lineHeight
-                lineHeight = childHeight
-            } else {
-                lineWidth += childWidth
-                lineHeight = lineHeight.coerceAtLeast(childHeight)
+            if (maxLine != -1 && lineCount <= maxLine) {
+                if (lineWidth + childWidth > sizeWidth - paddingLeft - paddingRight) {
+                    lineCount++
+                    width = width.coerceAtLeast(lineWidth)
+                    lineWidth = childWidth
+                    height += lineHeight
+                    lineHeight = childHeight
+                } else {
+                    lineWidth += childWidth
+                    lineHeight = lineHeight.coerceAtLeast(childHeight)
+                }
+                if (lineCount == maxLine + 1) {
+                    lineWidth = 0
+                    lineHeight = 0
+                }
+            } else if (maxLine == -1) {
+                if (lineWidth + childWidth > sizeWidth - paddingLeft - paddingRight) {
+                    lineCount++
+                    width = width.coerceAtLeast(lineWidth)
+                    lineWidth = childWidth
+                    height += lineHeight
+                    lineHeight = childHeight
+                } else {
+                    lineWidth += childWidth
+                    lineHeight = lineHeight.coerceAtLeast(childHeight)
+                }
             }
 
             if (it == mCount - 1) {
@@ -93,6 +132,7 @@ open class FlowView @JvmOverloads constructor(private val mContext: Context, att
                 height += lineHeight
             }
         }
+        lineCount.toLogD("onMeasure lineCount：")
         setMeasuredDimension(
             if (modeWidth == MeasureSpec.EXACTLY) sizeWidth else width + paddingLeft + paddingRight,
             if (modeHeight == MeasureSpec.EXACTLY) sizeHeight else height + paddingTop + paddingRight
@@ -112,6 +152,8 @@ open class FlowView @JvmOverloads constructor(private val mContext: Context, att
         var lineHeight = 0
         val mCount = childCount
 
+        var mLineCount = 1
+
         (0 until mCount).forEach {
             val child = getChildAt(it)
             if (child.visibility == View.GONE) return@forEach
@@ -120,20 +162,39 @@ open class FlowView @JvmOverloads constructor(private val mContext: Context, att
             val childWidth = child.measuredWidth
             val childHeight = child.measuredHeight
 
-            if (childWidth + lineWidth + lp.leftMargin + lp.rightMargin > width - paddingLeft - paddingRight) {
-                mLineHeight.add(lineHeight)
-                allViews.add(lineViews)
-                mLineWidth.add(lineWidth)
+            if (maxLine != -1 && mLineCount <= maxLine) {
+                if (childWidth + lineWidth + lp.leftMargin + lp.rightMargin > width - paddingLeft - paddingRight) {
+                    mLineHeight.add(lineHeight)
+                    allViews.add(lineViews)
+                    mLineWidth.add(lineWidth)
 
-                lineWidth = 0
-                lineHeight = childHeight + lp.topMargin + lp.bottomMargin
-                lineViews = mutableListOf()
+                    lineWidth = 0
+                    lineHeight = childHeight + lp.topMargin + lp.bottomMargin
+                    lineViews = mutableListOf()
+                    mLineCount++
+                }
+
+                lineWidth += childWidth + lp.leftMargin + lp.rightMargin
+                lineHeight = lineHeight.coerceAtLeast(childHeight + lp.topMargin + lp.bottomMargin)
+                lineViews.add(child)
+            } else if (maxLine == -1) {
+                if (childWidth + lineWidth + lp.leftMargin + lp.rightMargin > width - paddingLeft - paddingRight) {
+                    mLineHeight.add(lineHeight)
+                    allViews.add(lineViews)
+                    mLineWidth.add(lineWidth)
+
+                    lineWidth = 0
+                    lineHeight = childHeight + lp.topMargin + lp.bottomMargin
+                    lineViews = mutableListOf()
+                    mLineCount++
+                }
+
+                lineWidth += childWidth + lp.leftMargin + lp.rightMargin
+                lineHeight = lineHeight.coerceAtLeast(childHeight + lp.topMargin + lp.bottomMargin)
+                lineViews.add(child)
             }
-
-            lineWidth += childWidth + lp.leftMargin + lp.rightMargin
-            lineHeight = lineHeight.coerceAtLeast(childHeight + lp.topMargin + lp.bottomMargin)
-            lineViews.add(child)
         }
+        mLineCount.toLogD("onLayout lineCount：")
 
         mLineHeight.add(lineHeight)
         mLineWidth.add(lineWidth)
@@ -182,6 +243,10 @@ open class FlowView @JvmOverloads constructor(private val mContext: Context, att
 
     override fun setGravity(gravity: IFlowView.FlowViewGravity) {
         this.mGravity = gravity
+    }
+
+    override fun setMaxLine(maxLine: Int) {
+        this.maxLine = maxLine
     }
 
     override fun generateLayoutParams(attrs: AttributeSet?): LayoutParams {
