@@ -4,7 +4,6 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
-import com.ripple.log.tpyeextend.toLogD
 import com.ripple.ui.flowview.IFlowView
 
 
@@ -132,7 +131,6 @@ open class FlowView @JvmOverloads constructor(
                 height += lineHeight
             }
         }
-        lineCount.toLogD("onMeasure lineCount：")
         setMeasuredDimension(
             if (modeWidth == MeasureSpec.EXACTLY) sizeWidth else width + paddingLeft + paddingRight,
             if (modeHeight == MeasureSpec.EXACTLY) sizeHeight else height + paddingTop + paddingRight
@@ -194,8 +192,6 @@ open class FlowView @JvmOverloads constructor(
                 lineViews.add(child)
             }
         }
-        mLineCount.toLogD("onLayout lineCount：")
-
         mLineHeight.add(lineHeight)
         mLineWidth.add(lineWidth)
         allViews.add(lineViews)
